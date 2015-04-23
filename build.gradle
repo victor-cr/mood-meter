@@ -1,0 +1,13 @@
+apply plugin: "idea"
+
+allprojects {
+  group = 'com.codegans.moodmeter'
+  version = '1.0'
+
+  repositories {
+    jcenter()
+  }
+}
+
+idea.project {
+}

@@ -1,0 +1,61 @@
+apply plugin: "scala"
+apply plugin: "war"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+compileJava.options.encoding = 'UTF-8'
+compileScala.options.encoding = 'UTF-8'
+
+//tasks.withType(ScalaCompile) {
+//  scalaCompileOptions.encoding = "UTF-8"
+//}
+
+task explodedWar(type: Copy) {
+  into "$buildDir/exploded"
+  with war
+}
+
+war {
+  baseName = "mm-server"
+  dependsOn = [explodedWar]
+}
+
+configurations {
+  provided
+  compile.extendsFrom provided
+}
+
+sourceSets {
+  main.compileClasspath += configurations.provided
+  test.compileClasspath += configurations.provided
+  main.runtimeClasspath -= configurations.provided
+  test.runtimeClasspath += configurations.provided
+}
+
+def scalaVersion = "2.11.6"
+def akkaVersion = "2.3.9"
+def sprayVersion = "1.3.3"
+def scalaLibSuffix = scalaVersion.replaceFirst("\\.\\d+\$", "");
+
+dependencies {
+//  compile project(":client")
+  compile "org.scala-lang:scala-library:$scalaVersion"
+//  compile "org.scala-lang:scala-reflect:$scalaVersion"
+  compile "io.spray:spray-servlet_$scalaLibSuffix:$sprayVersion"
+  compile "io.spray:spray-routing_$scalaLibSuffix:$sprayVersion"
+  compile "io.spray:spray-io_$scalaLibSuffix:$sprayVersion"
+  compile "io.spray:spray-json_$scalaLibSuffix:1.3.1"
+  compile "com.typesafe.akka:akka-actor_$scalaLibSuffix:$akkaVersion"
+  compile "com.typesafe.akka:akka-agent_$scalaLibSuffix:$akkaVersion"
+  compile "com.typesafe.akka:akka-slf4j_$scalaLibSuffix:$akkaVersion"
+  compile "org.squeryl:squeryl_$scalaLibSuffix:0.9.5-7"
+
+  provided "org.slf4j:slf4j-api:1.7.9"
+
+  testCompile "junit:junit:4.12"
+  testCompile "org.scalatest:scalatest_$scalaLibSuffix:2.2.4"
+  testCompile "io.spray:spray-testkit_$scalaLibSuffix:$sprayVersion"
+  testCompile "com.typesafe.akka:akka-testkit_$scalaLibSuffix:$akkaVersion"
+  testCompile "org.specs2:specs2-core_$scalaLibSuffix:2.4.17"
+  testRuntime "org.scala-lang.modules:scala-xml_$scalaLibSuffix:1.0.2"
+}
